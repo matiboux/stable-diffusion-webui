@@ -1,26 +1,26 @@
 version: '3.4'
 
-# Services definition for local building & deployment
+# Services definition for building & deploying
 
 services:
 
   app:
     # Build
-    image: ${IMAGES_PREFIX:-app}-app
+    image: ${IMAGES_PREFIX:-stable-diffusion-webui}:${DOCKER_TAG:-latest}
     build:
       context: .
       dockerfile: ./Dockerfile
-      target: app_prod
+      target: app_dev
+      args:
+        PORT: ${EXPOSED_PORT:-80}
     # Deploy
-    # extra_hosts:
-    #   - host.docker.internal:host-gateway
     volumes:
       - .:/app
       - /app/venv
       # - .:/home/app
       # - /home/app/venv # Does not work with non-root user
-    # ports:
-    #   # HTTP
-    #   - target: 80
-    #     published: ${HTTP_PORT:-80}
-    #     protocol: tcp
+    ports:
+      # HTTP
+      - target: ${EXPOSED_PORT:-80}
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
