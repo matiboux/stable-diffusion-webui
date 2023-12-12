@@ -1,0 +1,12 @@
+version: '3.4'
+
+# Services overrides for running on CUDA GPU
+
+services:
+
+  app:
+    # Build override
+    image: ${IMAGES_PREFIX:-stable-diffusion-webui-cuda}:${DOCKER_TAG:-latest}
+    build:
+      args:
+        PYTHON_BASE: ${PYTHON_BASE:-cuda}

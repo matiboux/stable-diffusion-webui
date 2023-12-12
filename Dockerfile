@@ -2,16 +2,51 @@
 
 # This Dockerfile uses the root project folder as context.
 
+# Dockerfile global arguments
+# PYTHON_BASE valid values: base, cuda, rocm
+ARG PYTHON_BASE='base'
+ARG PYTHON_VERSION='3.10'
+ARG CUDA_VERSION='12.1.1'
+
+
 # --
 # Upstream images
 
-FROM python:3.10-slim AS python_upstream
+FROM python:${PYTHON_VERSION}-slim AS python_upstream
+FROM nvidia/cuda:${CUDA_VERSION}-cudnn8-runtime-ubuntu22.04 AS cuda_upstream
+
+
+# --
+# Python Base image
+
+FROM python_upstream AS python_base
+
+
+# --
+# Python CUDA image
+
+FROM cuda_upstream AS python_cuda
+
+ARG PYTHON_VERSION
+ARG DEBIAN_FRONTEND='noninteractive'
+
+# Install Python
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends \
+		python${PYTHON_VERSION} \
+		python3-pip \
+		&& \
+	# Change default python version
+	ln -sf python${PYTHON_VERSION} /usr/bin/python && \
+	# Clean up
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/*
 
 
 # --
 # Base image
 
-FROM python_upstream AS app_base
+FROM python_${PYTHON_BASE} AS app_base
 
 WORKDIR /app
 
@@ -32,9 +67,16 @@ RUN apt-get update && \
 
 # Install requirements
 COPY --link ./requirements_versions.txt .
-RUN pip install --no-cache-dir \
-		-r requirements_versions.txt \
-		&& \
+RUN if [ "${PYTHON_BASE}" = 'cuda' ]; then \
+		pip install --no-cache-dir \
+			--index-url "https://download.pytorch.org/whl/cu$(echo "${CUDA_VERSION}" | cut -d '.' -f 1,2 | tr -d '.')" \
+			-r requirements_versions.txt \
+		; \
+	else \
+		pip install --no-cache-dir \
+			-r requirements_versions.txt \
+		; \
+	fi && \
 	# Clean up
 	pip cache purge && \
 	rm -rf /root/.cache/pip
@@ -65,7 +107,7 @@ VOLUME /app
 # Expose port
 EXPOSE ${PORT}
 
-CMD [ "sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
+CMD [ "/bin/sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
 
 
 # --
@@ -79,4 +121,4 @@ COPY --link . .
 # Expose port
 EXPOSE ${PORT}
 
-CMD [ "sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
+CMD [ "/bin/sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
