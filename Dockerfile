@@ -7,6 +7,7 @@
 ARG PYTHON_BASE='base'
 ARG PYTHON_VERSION='3.10'
 ARG CUDA_VERSION='12.1.1'
+ARG ROCM_VERSION='5.6'
 
 
 # --
@@ -41,6 +42,12 @@ RUN apt-get update && \
 	# Clean up
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
+
+
+# --
+# Python ROCm image
+
+FROM python_upstream AS python_rocm
 
 
 # --
