@@ -45,7 +45,7 @@ ENV PORT=${PORT}
 
 # Create user 'user' and group 'app'
 RUN groupadd app && \
-	useradd -lMN -G app -d /app user && \
+	useradd -lm -G app user && \
 	chown -R user:app /app
 USER user
 
