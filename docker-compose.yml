@@ -19,6 +19,13 @@ services:
       - /app/venv
       # - .:/home/app
       # - /home/app/venv # Does not work with non-root user
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
     ports:
       # HTTP
       - target: ${EXPOSED_PORT:-80}
