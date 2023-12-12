@@ -130,6 +130,17 @@ wget -q https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui/m
 ```
 3. Run `webui.sh`.
 4. Check `webui-user.sh` for options.
+
+### Automatic Installation for Docker
+1. Install [Docker](https://docs.docker.com/engine/install/) & [git](https://git-scm.com/downloads).
+2. Download the stable-diffusion-webui repository, for example by running `git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git`.
+3. Verify that you have Docker Compose installed by running `docker compose`.
+4. Run the docker command below corresponding to your GPU type:
+   - On CUDA GPU: `docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --build -d`
+   - On ROCm GPU: `docker compose -f docker-compose.yml -f docker-compose.rocm.yml up --build -d`
+   - On GPU (using generic image): `docker compose up --build -d`
+5. Open your browser and navigate to [http://localhost:80](http://localhost:80) to access the webui.
+
 ### Installation on Apple Silicon
 
 Find the instructions [here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon).
