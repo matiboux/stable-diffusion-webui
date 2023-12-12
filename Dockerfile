@@ -65,8 +65,7 @@ VOLUME /app
 # Expose port
 EXPOSE ${PORT}
 
-# Run app
-CMD [ "./webui.sh", "--port", "\"${PORT}\"" ]
+CMD [ "sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
 
 
 # --
@@ -80,5 +79,4 @@ COPY --link . .
 # Expose port
 EXPOSE ${PORT}
 
-# Run app
-CMD [ "./webui.sh", "--port", "\"${PORT}\"" ]
+CMD [ "sh", "-c", "./webui.sh --listen --port \"${PORT}\"" ]
